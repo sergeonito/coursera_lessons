@@ -159,6 +159,7 @@ body {
 .header {
 	text-align: center;
 	font-size: 1.75em;
+	margin-top: 10px;
 }
 
 .menu-item {
