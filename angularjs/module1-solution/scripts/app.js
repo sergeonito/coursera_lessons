@@ -13,13 +13,16 @@ function LunchCheckController($scope) {
     var items = $scope.lunch_menu.split(',').filter(v=>v.trim()!='');
     if (items.length == 0) {
       $scope.message = 'Please enter data first';
-      $scope.msg_style = {'color':'red','border':'1px solid red'}
+      $scope.msgStyle = {'color':'red'}
+      $scope.txtBoxStyle = {'border':'1px solid red'}
     } else if (items.length <= 3) {
       $scope.message = 'Enjoy!';
-      $scope.msg_style = {'color':'green','border':'1px solid green'}
+      $scope.msgStyle = {'color':'green'}
+      $scope.txtBoxStyle = {'border':'1px solid green'}
     } else {
       $scope.message = 'Too much!';
-      $scope.msg_style = {'color':'green','border':'1px solid green'}
+      $scope.msgStyle = {'color':'green'}
+      $scope.txtBoxStyle = {'border':'1px solid green'}
     }
   }
 }
