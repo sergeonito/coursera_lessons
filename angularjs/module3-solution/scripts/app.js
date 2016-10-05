@@ -1,29 +1,70 @@
 (function () {
 'use strict'
 
-angular.module('LunchCheck', [])
-.controller('LunchCheckController', LunchCheckController);
+angular.module('NarrowItDownApp', [])
+.controller('NarrowItDownController', NarrowItDownController)
+.service('MenuSearchService', MenuSearchService)
+.directive('foundItems', FoundItemsDirective);
 
-LunchCheckController.$inject = ['$scope'];
-function LunchCheckController($scope) {
-  $scope.lunch_menu = '';
+function FoundItemsDirective() {
+  var ddo = {
+    templateUrl: 'templates/foundItems.html',
+    scope: {
+      items: '<',
+      onRemove: '&'
+    },
+    controller: NarrowItDownController,
+    controllerAs: 'list',
+    bindToController: true
+  };
 
-  $scope.check_items = function () {
-    // parse string to array with cutting empty values
-    var items = $scope.lunch_menu.split(',').filter(v=>v.trim()!='');
-    if (items.length == 0) {
-      $scope.message = 'Please enter data first';
-      $scope.msgStyle = {'color':'red'}
-      $scope.txtBoxStyle = {'border':'1px solid red'}
-    } else if (items.length <= 3) {
-      $scope.message = 'Enjoy!';
-      $scope.msgStyle = {'color':'green'}
-      $scope.txtBoxStyle = {'border':'1px solid green'}
-    } else {
-      $scope.message = 'Too much!';
-      $scope.msgStyle = {'color':'green'}
-      $scope.txtBoxStyle = {'border':'1px solid green'}
-    }
-  }
+  return ddo;
 }
+
+
+NarrowItDownController.$inject = ['MenuSearchService'];
+function NarrowItDownController(MenuSearchService) {
+  var list = this;
+
+  list.clickNarrow = function() {
+    list.found = MenuSearchService.getMatchedMenuItems(list.searchTerm);
+  };
+
+  list.removeItem = function (itemIndex) {
+    list.found.splice(itemIndex,1);
+  };
+}
+
+
+MenuSearchService.$inject = ['$http'];
+function MenuSearchService ($http) {
+  var service = this;
+
+  service.getMatchedMenuItems = function (searchTerm) {
+    console.log('searchTerm variable is: ' + searchTerm);
+
+    var foundItems = [];
+    // If searchTerm is empty return empty response array
+    if (searchTerm == undefined || searchTerm == '') {
+      return foundItems;
+    }
+
+    $http({
+      method: 'GET',
+      url: 'https://davids-restaurant.herokuapp.com/menu_items.json'})
+    .then(function successCallback(response) {
+      var menu_items = response.data.menu_items;
+
+      for (var i = 0; i < menu_items.length; i++) {
+        if (menu_items[i].description.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
+          foundItems.push(menu_items[i]);
+        }
+      }
+     });
+    return foundItems;
+  };
+}
+
+
+
 })();
